@@ -30,6 +30,7 @@ static int populate_row_callback (void *data, int colCount, char *values[], char
                                              1, values[1], // Region
                                              2, values[2], // Name
                                              3, values[8], // Size
+                                             4, values[3], // Url
                                              -1);
   return 0;
 }
@@ -111,5 +112,17 @@ void on_refresh_button_clicked (GtkButton *button, gpointer user_data) {
   int res = syn_refresh_db ();
   if (res == SYN_OK) {
     populate_grid ();
+  }
+}
+
+void  on_row_doubleclicked (GtkTreeView *treeview, GtkTreePath *path, GtkTreeViewColumn *col, gpointer userdata) {
+  GtkTreeModel *model = gtk_tree_view_get_model (treeview);
+  GtkTreeIter rowIter;
+
+  if (gtk_tree_model_get_iter (model, &rowIter, path)) {
+    gchar *url;
+    gtk_tree_model_get (model, &rowIter, 4, &url, -1);
+    g_print ("URL: %s\n", url);
+    g_free (url);
   }
 }

@@ -12,6 +12,8 @@
       <column type="gchararray"/>
       <!-- column-name Size -->
       <column type="gchararray"/>
+      <!-- column-name Url -->
+      <column type="gchararray"/>
     </columns>
   </object>
   <object class="GtkPopoverMenu" id="popover_menu">
@@ -97,6 +99,7 @@
                     <property name="fixed_height_mode">True</property>
                     <property name="show_expanders">False</property>
                     <property name="enable_grid_lines">both</property>
+                    <signal name="row-activated" handler="on_row_doubleclicked" swapped="no"/>
                     <child internal-child="selection">
                       <object class="GtkTreeSelection"/>
                     </child>
@@ -162,6 +165,23 @@
                           <object class="GtkCellRendererText"/>
                           <attributes>
                             <attribute name="text">3</attribute>
+                          </attributes>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkTreeViewColumn" id="url_column">
+                        <property name="visible">False</property>
+                        <property name="sizing">fixed</property>
+                        <property name="fixed_width">100</property>
+                        <property name="min_width">20</property>
+                        <property name="title" translatable="yes">Url</property>
+                        <property name="alignment">0.5</property>
+                        <property name="sort_column_id">4</property>
+                        <child>
+                          <object class="GtkCellRendererText"/>
+                          <attributes>
+                            <attribute name="text">4</attribute>
                           </attributes>
                         </child>
                       </object>
