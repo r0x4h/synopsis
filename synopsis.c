@@ -12,6 +12,15 @@ GtkTreeView *tree_view;
 GtkListStore *list_store;
 GtkTreeModelFilter *filter_model;
 
+enum columns {
+  COL_DOWNLOAD,
+  COL_TITLE_ID,
+  COL_REGION,
+  COL_NAME,
+  COL_SIZE,
+  COL_LINK
+};
+
 void show_dialog (char *message) {
   GtkWidget *dialog = gtk_message_dialog_new (GTK_WINDOW(window),
                         GTK_DIALOG_DESTROY_WITH_PARENT,
@@ -26,11 +35,12 @@ void show_dialog (char *message) {
 static int populate_row_callback (void *data, int colCount, char *values[], char *colNames[]) {
   GtkTreeIter row_iter;
   gtk_list_store_append (list_store, &row_iter);
-  gtk_list_store_set (list_store, &row_iter, 0, values[0], // TitleID
-                                             1, values[1], // Region
-                                             2, values[2], // Name
-                                             3, values[8], // Size
-                                             4, values[3], // Url
+  gtk_list_store_set (list_store, &row_iter, COL_DOWNLOAD, TRUE,
+                                             COL_TITLE_ID, values[0],
+                                             COL_REGION, values[1],
+                                             COL_NAME, values[2],
+                                             COL_SIZE, values[8],
+                                             COL_LINK, values[3],
                                              -1);
   return 0;
 }
@@ -45,7 +55,7 @@ static gboolean search_filter_func (GtkTreeModel *model, GtkTreeIter *row, gpoin
 
   // get row
   gchar *titleId, *region, *name;
-  gtk_tree_model_get (model, row, 0, &titleId, 1, &region, 2, &name, -1);
+  gtk_tree_model_get (model, row, 1, &titleId, 2, &region, 3, &name, -1);
 
   // does row match?
   const gchar *search_text = gtk_entry_get_text (GTK_ENTRY (search_entry));
@@ -115,14 +125,15 @@ void on_refresh_button_clicked (GtkButton *button, gpointer user_data) {
   }
 }
 
-void  on_row_doubleclicked (GtkTreeView *treeview, GtkTreePath *path, GtkTreeViewColumn *col, gpointer userdata) {
-  GtkTreeModel *model = gtk_tree_view_get_model (treeview);
-  GtkTreeIter rowIter;
+void download_toggled (GtkCellRendererToggle *cell, gchar *path_string, gpointer user_data) {
+  GtkTreeModel *model = gtk_tree_view_get_model (tree_view);
+  GtkTreePath *path = gtk_tree_path_new_from_string (path_string);
 
+  GtkTreeIter rowIter;
   if (gtk_tree_model_get_iter (model, &rowIter, path)) {
-    gchar *url;
-    gtk_tree_model_get (model, &rowIter, 4, &url, -1);
-    g_print ("URL: %s\n", url);
-    g_free (url);
+    gchar *link;
+    gtk_tree_model_get (model, &rowIter, COL_LINK, &link, -1);
+    g_print ("URL: %s\n", link);
+    g_free (link);
   }
 }
