@@ -131,9 +131,12 @@ void download_toggled (GtkCellRendererToggle *cell, gchar *path_string, gpointer
 
   GtkTreeIter rowIter;
   if (gtk_tree_model_get_iter (model, &rowIter, path)) {
-    gchar *link;
-    gtk_tree_model_get (model, &rowIter, COL_LINK, &link, -1);
+    gchar *titleId, *link;
+    gtk_tree_model_get (model, &rowIter, COL_TITLE_ID, &titleId, COL_LINK, &link, -1);
     g_print ("URL: %s\n", link);
+    download_file (link, titleId);
+
+    g_free (titleId);
     g_free (link);
   }
 }
