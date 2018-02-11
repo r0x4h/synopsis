@@ -18,7 +18,8 @@ enum columns {
   COL_REGION,
   COL_NAME,
   COL_SIZE,
-  COL_LINK
+  COL_LINK,
+  N_COLUMNS
 };
 
 void show_dialog (char *message) {
@@ -128,15 +129,20 @@ void on_refresh_button_clicked (GtkButton *button, gpointer user_data) {
 void download_toggled (GtkCellRendererToggle *cell, gchar *path_string, gpointer user_data) {
   GtkTreeModel *model = gtk_tree_view_get_model (tree_view);
   GtkTreePath *path = gtk_tree_path_new_from_string (path_string);
+  gboolean checked = gtk_cell_renderer_toggle_get_active (cell);
 
-  GtkTreeIter rowIter;
-  if (gtk_tree_model_get_iter (model, &rowIter, path)) {
-    gchar *titleId, *link;
-    gtk_tree_model_get (model, &rowIter, COL_TITLE_ID, &titleId, COL_LINK, &link, -1);
-    g_print ("URL: %s\n", link);
-    download_file (link, titleId);
+  GtkTreeIter filterIter;
+  if (gtk_tree_model_get_iter (model, &filterIter, path)) {
+    GtkTreeIter listStoreIter;
+    gtk_tree_model_filter_convert_iter_to_child_iter (filter_model, &listStoreIter, &filterIter);
+    gtk_list_store_set (list_store, &listStoreIter, COL_DOWNLOAD, !checked, -1);
 
-    g_free (titleId);
-    g_free (link);
+    // gchar *titleId, *link;
+    // gtk_tree_model_get (model, &rowIter, COL_TITLE_ID, &titleId, COL_LINK, &link, -1);
+    // g_print ("URL: %s\n", link);
+    // download_file (link, titleId);
+    //
+    // g_free (titleId);
+    // g_free (link);
   }
 }

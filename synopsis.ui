@@ -110,8 +110,11 @@
                         <property name="fixed_width">40</property>
                         <child>
                           <object class="GtkCellRendererToggle" id="download_toggle">
-                            <signal name="toggled" handler="download_toggled"/>
+                            <signal name="toggled" handler="download_toggled" swapped="no"/>
                           </object>
+                          <attributes>
+                            <attribute name="active">0</attribute>
+                          </attributes>
                         </child>
                       </object>
                     </child>
