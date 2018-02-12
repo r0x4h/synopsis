@@ -131,7 +131,7 @@ void on_refresh_button_clicked (GtkButton *button, gpointer user_data) {
 }
 
 void show_queued_notification (char *titleId, char *name) {
-  char *label = g_markup_printf_escaped ("Queued '%s - %s'", titleId, name);
+  char *label = g_markup_printf_escaped ("Queued '%s'", name);
   gtk_label_set_markup (GTK_LABEL (in_app_notification_label), label);
   gtk_revealer_set_reveal_child (GTK_REVEALER (in_app_notification_revealer), TRUE);
 }
