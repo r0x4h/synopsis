@@ -5,6 +5,8 @@
 #include "util.h"
 
 GtkWidget *window;
+GtkRevealer *in_app_notification_revealer;
+GtkLabel *in_app_notification_label;
 GtkToggleButton *search_toggle;
 GtkSearchBar *search_bar;
 GtkSearchEntry *search_entry;
@@ -18,7 +20,7 @@ enum columns {
   COL_REGION,
   COL_NAME,
   COL_SIZE,
-  COL_LINK,
+  COL_URL,
   N_COLUMNS
 };
 
@@ -36,12 +38,12 @@ void show_dialog (char *message) {
 static int populate_row_callback (void *data, int colCount, char *values[], char *colNames[]) {
   GtkTreeIter row_iter;
   gtk_list_store_append (list_store, &row_iter);
-  gtk_list_store_set (list_store, &row_iter, COL_DOWNLOAD, TRUE,
+  gtk_list_store_set (list_store, &row_iter, COL_DOWNLOAD, FALSE,
                                              COL_TITLE_ID, values[0],
                                              COL_REGION, values[1],
                                              COL_NAME, values[2],
                                              COL_SIZE, values[8],
-                                             COL_LINK, values[3],
+                                             COL_URL, values[3],
                                              -1);
   return 0;
 }
@@ -77,6 +79,8 @@ static gboolean search_filter_func (GtkTreeModel *model, GtkTreeIter *row, gpoin
 static void activate (GtkApplication* app, gpointer user_data) {
   GtkBuilder *builder = gtk_builder_new_from_file ("synopsis.ui");
   window = GTK_WIDGET (gtk_builder_get_object (builder, "window"));
+  in_app_notification_revealer = GTK_REVEALER (gtk_builder_get_object (builder, "in_app_notification_revealer"));
+  in_app_notification_label = GTK_LABEL (gtk_builder_get_object (builder, "in_app_notification_label"));
   search_toggle = GTK_TOGGLE_BUTTON (gtk_builder_get_object (builder, "search_toggle"));
   search_bar = GTK_SEARCH_BAR (gtk_builder_get_object (builder, "search_bar"));
   search_entry = GTK_SEARCH_ENTRY (gtk_builder_get_object (builder, "search_entry"));
@@ -126,6 +130,17 @@ void on_refresh_button_clicked (GtkButton *button, gpointer user_data) {
   }
 }
 
+void show_queued_notification (char *titleId, char *name) {
+  char *label = g_markup_printf_escaped ("Queued '%s - %s'", titleId, name);
+  gtk_label_set_markup (GTK_LABEL (in_app_notification_label), label);
+  gtk_revealer_set_reveal_child (GTK_REVEALER (in_app_notification_revealer), TRUE);
+}
+
+void add_to_download_queue (char *titleId, char *name, char *url) {
+  show_queued_notification (titleId, name);
+  // add to queue
+}
+
 void download_toggled (GtkCellRendererToggle *cell, gchar *path_string, gpointer user_data) {
   GtkTreeModel *model = gtk_tree_view_get_model (tree_view);
   GtkTreePath *path = gtk_tree_path_new_from_string (path_string);
@@ -137,12 +152,17 @@ void download_toggled (GtkCellRendererToggle *cell, gchar *path_string, gpointer
     gtk_tree_model_filter_convert_iter_to_child_iter (filter_model, &listStoreIter, &filterIter);
     gtk_list_store_set (list_store, &listStoreIter, COL_DOWNLOAD, !checked, -1);
 
-    // gchar *titleId, *link;
+
+    // show notification
+    gchar *titleId, *name, *url;
+    gtk_tree_model_get (model, &filterIter, COL_TITLE_ID, &titleId, COL_NAME, &name, COL_URL, &url, -1);
+    add_to_download_queue (titleId, name, url);
+    g_free (titleId);
+    g_free (name);
+    g_free (url);
+
     // gtk_tree_model_get (model, &rowIter, COL_TITLE_ID, &titleId, COL_LINK, &link, -1);
     // g_print ("URL: %s\n", link);
     // download_file (link, titleId);
-    //
-    // g_free (titleId);
-    // g_free (link);
   }
 }
