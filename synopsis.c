@@ -166,3 +166,7 @@ void download_toggled (GtkCellRendererToggle *cell, gchar *path_string, gpointer
     // download_file (link, titleId);
   }
 }
+
+void notification_dismissed (GtkButton *button, gpointer user_data) {
+  gtk_revealer_set_reveal_child (GTK_REVEALER (in_app_notification_revealer), FALSE);
+}
