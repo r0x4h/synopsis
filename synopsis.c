@@ -4,6 +4,8 @@
 #include "nopslib.h"
 #include "util.h"
 
+#define NOTIFICATION_TIMEOUT 3 /*s */
+
 GtkWidget *window;
 GtkRevealer *in_app_notification_revealer;
 GtkLabel *in_app_notification_label;
@@ -130,10 +132,17 @@ void on_refresh_button_clicked (GtkButton *button, gpointer user_data) {
   }
 }
 
+static gboolean on_in_app_notification_undo_timeout (GtkWidget *window) {
+  gtk_revealer_set_reveal_child (GTK_REVEALER (in_app_notification_revealer), FALSE);
+  return G_SOURCE_REMOVE;
+}
+
 void show_queued_notification (char *titleId, char *name) {
   char *label = g_markup_printf_escaped ("Queued '%s'", name);
   gtk_label_set_markup (GTK_LABEL (in_app_notification_label), label);
   gtk_revealer_set_reveal_child (GTK_REVEALER (in_app_notification_revealer), TRUE);
+
+  g_timeout_add_seconds (NOTIFICATION_TIMEOUT, (GSourceFunc) on_in_app_notification_undo_timeout, window);
 }
 
 void add_to_download_queue (char *titleId, char *name, char *url) {
