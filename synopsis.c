@@ -179,3 +179,35 @@ void download_toggled (GtkCellRendererToggle *cell, gchar *path_string, gpointer
 void notification_dismissed (GtkButton *button, gpointer user_data) {
   gtk_revealer_set_reveal_child (GTK_REVEALER (in_app_notification_revealer), FALSE);
 }
+
+gdouble get_overall_progress() {
+  return 0.65;
+}
+
+gboolean on_operations_icon_draw (GtkWidget *widget, cairo_t *cr, gpointer user_data) {
+    GtkStyleContext *styleContext = gtk_widget_get_style_context (widget);
+
+    GdkRGBA background;
+    GdkRGBA foreground;
+    gtk_style_context_get_color (styleContext, gtk_widget_get_state_flags (widget), &foreground);
+    background = foreground;
+    background.alpha *= 0.3;
+
+    gdouble progress = get_overall_progress();
+    guint width = gtk_widget_get_allocated_width (widget);
+    guint height = gtk_widget_get_allocated_height (widget);
+
+    // draw background circle
+    gdk_cairo_set_source_rgba (cr, &background);
+    cairo_arc (cr, width / 2.0, height / 2.0, MIN (width, height) / 2.0, 0, 2 * G_PI);
+    cairo_fill (cr);
+
+    cairo_move_to (cr, width / 2.0, height / 2.0);
+
+    // draw foreground arc
+    gdk_cairo_set_source_rgba (cr, &foreground);
+    cairo_arc (cr, width / 2.0, height / 2.0, MIN (width, height) / 2.0, -G_PI / 2.0, progress * 2 * G_PI - G_PI / 2.0);
+    cairo_fill (cr);
+
+    return FALSE;
+}

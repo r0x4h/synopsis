@@ -18,6 +18,18 @@
       <column type="gchararray"/>
     </columns>
   </object>
+  <object class="GtkPopover" id="downloads_popover">
+    <property name="can_focus">False</property>
+    <child>
+      <object class="GtkScrolledWindow">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="hscrollbar_policy">never</property>
+        <property name="max_content_height">270</property>
+        <property name="propagate_natural_height">True</property>
+      </object>
+    </child>
+  </object>
   <object class="GtkPopoverMenu" id="popover_menu">
     <property name="can_focus">False</property>
     <child>
@@ -286,6 +298,7 @@
             <property name="can_focus">True</property>
             <property name="receives_default">False</property>
             <property name="popover">popover_menu</property>
+            <property name="tooltip_text" translatable="yes">Show menu</property>
             <child>
               <object class="GtkImage" id="menu_icon">
                 <property name="visible">True</property>
@@ -308,6 +321,7 @@
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">False</property>
+            <property name="tooltip_text" translatable="yes">Show search bar</property>
             <signal name="toggled" handler="on_search_button_toggled" swapped="no"/>
             <child>
               <object class="GtkImage" id="search_image">
@@ -320,6 +334,32 @@
           <packing>
             <property name="pack_type">end</property>
             <property name="position">2</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkMenuButton" id="downloads_button">
+            <property name="can_focus">False</property>
+            <property name="receives_default">False</property>
+            <property name="tooltip_text" translatable="yes">Show downloads</property>
+            <property name="popover">downloads_popover</property>
+            <child>
+              <object class="GtkDrawingArea" id="operations_icon">
+                <property name="width_request">16</property>
+                <property name="height_request">16</property>
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="halign">center</property>
+                <property name="valign">center</property>
+                <signal name="draw" handler="on_operations_icon_draw" swapped="no"/>
+              </object>
+            </child>
+            <style>
+              <class name="button"/>
+            </style>
+          </object>
+          <packing>
+            <property name="pack_type">end</property>
+            <property name="position">3</property>
           </packing>
         </child>
       </object>
