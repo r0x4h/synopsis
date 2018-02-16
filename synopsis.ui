@@ -5,17 +5,14 @@
   <object class="GtkPopover" id="downloads_popover">
     <property name="can_focus">True</property>
     <child>
-      <object class="GtkBox">
+      <object class="GtkBox" id="downloads_box">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="orientation">vertical</property>
         <child>
-          <object class="GtkStackSwitcher" id="tabs">
+          <object class="GtkLabel" id="download_name">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="stack">stack</property>
-            <property name="margin-start">6</property>
-            <property name="margin-end">6</property>
           </object>
           <packing>
             <property name="expand">False</property>
@@ -24,68 +21,14 @@
           </packing>
         </child>
         <child>
-          <object class="GtkStack" id="stack">
+          <object class="GtkProgressBar" id="download_progress">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <child>
-              <object class="GtkBox">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="orientation">vertical</property>
-                <child>
-                  <object class="GtkLabel">
-                    <property name="visible">True</property>
-                    <property name="label" translatable="yes">Test</property>
-                  </object>
-                </child>
-                <child>
-                  <object class="GtkLabel">
-                    <property name="visible">True</property>
-                    <property name="label" translatable="yes">Test</property>
-                  </object>
-                </child>
-                <child>
-                  <object class="GtkLabel">
-                    <property name="visible">True</property>
-                    <property name="label" translatable="yes">Test</property>
-                  </object>
-                </child>
-                <child>
-                  <object class="GtkLabel">
-                    <property name="visible">True</property>
-                    <property name="label" translatable="yes">Test</property>
-                  </object>
-                </child>
-              </object>
-              <packing>
-                <property name="title" translatable="yes">Downloading</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkBox">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="orientation">vertical</property>
-                <child>
-                  <object class="GtkLabel">
-                    <property name="visible">True</property>
-                    <property name="label" translatable="yes">Test</property>
-                  </object>
-                </child>
-                <child>
-                  <object class="GtkLabel">
-                    <property name="visible">True</property>
-                    <property name="label" translatable="yes">Test</property>
-                  </object>
-                </child>
-              </object>
-              <packing>
-                <property name="title" translatable="yes">Complete</property>
-              </packing>
-            </child>
+            <property name="fraction">0.5</property>
+            <property name="show_text">True</property>
           </object>
           <packing>
-            <property name="expand">True</property>
+            <property name="expand">False</property>
             <property name="fill">True</property>
             <property name="position">1</property>
           </packing>

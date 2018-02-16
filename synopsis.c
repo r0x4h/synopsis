@@ -15,6 +15,7 @@ GtkSearchEntry *search_entry;
 GtkTreeView *tree_view;
 GtkListStore *list_store;
 GtkTreeModelFilter *filter_model;
+GtkBox *downloads_box;
 
 enum columns {
   COL_DOWNLOAD,
@@ -89,6 +90,7 @@ static void activate (GtkApplication* app, gpointer user_data) {
   tree_view = GTK_TREE_VIEW (gtk_builder_get_object (builder, "tree_view"));
   list_store = GTK_LIST_STORE (gtk_builder_get_object (builder, "list_store"));
   filter_model = GTK_TREE_MODEL_FILTER (gtk_tree_model_filter_new (GTK_TREE_MODEL (list_store), NULL));
+  downloads_box = GTK_BOX (gtk_builder_get_object (builder, "downloads_box"));
 
   gtk_builder_connect_signals (builder, NULL);
   g_object_unref (builder);
@@ -147,7 +149,11 @@ void show_queued_notification (char *titleId, char *name) {
 
 void add_to_download_queue (char *titleId, char *name, char *url) {
   show_queued_notification (titleId, name);
-  // add to queue
+
+  // add entry to popup
+  GtkWidget *label = gtk_label_new (name);
+  gtk_box_pack_start (downloads_box, label, FALSE, TRUE, 0);
+  gtk_widget_show (label);
 }
 
 void download_toggled (GtkCellRendererToggle *cell, gchar *path_string, gpointer user_data) {
