@@ -31,7 +31,7 @@ void syn_get_data (void *callback) {
   sqlite3_close(db);
 }
 
-int download_file (char *url, char *filename) {
+int download_file (char *url, char *filename, void *progress_callback) {
   CURL *curl = curl_easy_init();
   if (!curl) {
     curl_easy_cleanup (curl);
@@ -41,6 +41,12 @@ int download_file (char *url, char *filename) {
   FILE *file = fopen (filename, "wb");
   curl_easy_setopt (curl, CURLOPT_URL, url);
   curl_easy_setopt (curl, CURLOPT_WRITEDATA, file);
+
+  if (progress_callback != NULL) {
+    curl_easy_setopt (curl, CURLOPT_NOPROGRESS, 0L);
+    curl_easy_setopt (curl, CURLOPT_PROGRESSFUNCTION, progress_callback);
+  }
+
   CURLcode res = curl_easy_perform (curl);
 
   fclose (file);
@@ -57,7 +63,7 @@ int download_files () {
     strcpy(fullUrl, baseUrl);
     strcat(fullUrl, fileName);
 
-    int res = download_file (fullUrl, fileName);
+    int res = download_file (fullUrl, fileName, NULL);
     if (res != SYN_OK) {
       return SYN_ERROR;
     }

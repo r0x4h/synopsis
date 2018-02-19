@@ -156,6 +156,11 @@ void add_to_download_queue (char *titleId, char *name, char *url) {
   gtk_widget_show (label);
 }
 
+static int progress_callback (void* ptr, double totalToDownload, double downloaded, double totalToUpload, double uploaded) {
+  g_print ("downloaded: %f\n", downloaded);
+  return 0;
+}
+
 void download_toggled (GtkCellRendererToggle *cell, gchar *path_string, gpointer user_data) {
   GtkTreeModel *model = gtk_tree_view_get_model (tree_view);
   GtkTreePath *path = gtk_tree_path_new_from_string (path_string);
@@ -167,18 +172,16 @@ void download_toggled (GtkCellRendererToggle *cell, gchar *path_string, gpointer
     gtk_tree_model_filter_convert_iter_to_child_iter (filter_model, &listStoreIter, &filterIter);
     gtk_list_store_set (list_store, &listStoreIter, COL_DOWNLOAD, !checked, -1);
 
-
     // show notification
     gchar *titleId, *name, *url;
     gtk_tree_model_get (model, &filterIter, COL_TITLE_ID, &titleId, COL_NAME, &name, COL_URL, &url, -1);
     add_to_download_queue (titleId, name, url);
+
+    download_file (url, titleId, progress_callback);
+
     g_free (titleId);
     g_free (name);
     g_free (url);
-
-    // gtk_tree_model_get (model, &rowIter, COL_TITLE_ID, &titleId, COL_LINK, &link, -1);
-    // g_print ("URL: %s\n", link);
-    // download_file (link, titleId);
   }
 }
 
