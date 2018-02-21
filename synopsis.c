@@ -18,6 +18,9 @@ GtkTreeView *tree_view;
 GtkListStore *list_store;
 GtkTreeModelFilter *filter_model;
 GtkBox *downloads_box;
+GtkWidget *download_progress_icon;
+
+gdouble progress = 0.65;
 
 typedef struct {
   gchar *titleId;
@@ -99,6 +102,7 @@ static void activate (GtkApplication* app, gpointer user_data) {
   list_store = GTK_LIST_STORE (gtk_builder_get_object (builder, "list_store"));
   filter_model = GTK_TREE_MODEL_FILTER (gtk_tree_model_filter_new (GTK_TREE_MODEL (list_store), NULL));
   downloads_box = GTK_BOX (gtk_builder_get_object (builder, "downloads_box"));
+  download_progress_icon = GTK_WIDGET (gtk_builder_get_object (builder, "download_progress_icon"));
 
   gtk_builder_connect_signals (builder, NULL);
   g_object_unref (builder);
@@ -164,13 +168,12 @@ void add_to_download_queue (char *titleId, char *name, char *url) {
   gtk_widget_show (label);
 }
 
-static int progress_callback (void* ptr, double totalToDownload, double downloaded, double totalToUpload, double uploaded) {
-  g_print ("downloaded: %f\n", downloaded);
+static int progress_callback (void* ptr, double downloadSize, double downloaded, double totalToUpload, double uploaded) {
+  //progress = downloaded / downloadSize;
+  //gtk_widget_queue_draw (download_progress_icon);
   return 0;
 }
 
-// A normal C function that is executed as a thread
-// when its name is specified in pthread_create()
 void *download_in_separate_thread (void *param) {
   Download *downloadInfo = param;
   download_file (downloadInfo->url, downloadInfo->titleId, progress_callback);
@@ -214,34 +217,31 @@ void notification_dismissed (GtkButton *button, gpointer user_data) {
   gtk_revealer_set_reveal_child (GTK_REVEALER (in_app_notification_revealer), FALSE);
 }
 
-gdouble get_overall_progress() {
-  return 0.65;
-}
-
 gboolean on_operations_icon_draw (GtkWidget *widget, cairo_t *cr, gpointer user_data) {
-    GtkStyleContext *styleContext = gtk_widget_get_style_context (widget);
+  GtkStyleContext *styleContext = gtk_widget_get_style_context (download_progress_icon);
 
-    GdkRGBA background;
-    GdkRGBA foreground;
-    gtk_style_context_get_color (styleContext, gtk_widget_get_state_flags (widget), &foreground);
-    background = foreground;
-    background.alpha *= 0.3;
+  GdkRGBA background;
+  GdkRGBA foreground;
+  gtk_style_context_get_color (styleContext, gtk_widget_get_state_flags (widget), &foreground);
+  background = foreground;
+  background.alpha *= 0.3;
 
-    gdouble progress = get_overall_progress();
-    guint width = gtk_widget_get_allocated_width (widget);
-    guint height = gtk_widget_get_allocated_height (widget);
+  guint width = gtk_widget_get_allocated_width (widget);
+  guint height = gtk_widget_get_allocated_height (widget);
 
-    // draw background circle
-    gdk_cairo_set_source_rgba (cr, &background);
-    cairo_arc (cr, width / 2.0, height / 2.0, MIN (width, height) / 2.0, 0, 2 * G_PI);
-    cairo_fill (cr);
+  // draw background circle
+  gdk_cairo_set_source_rgba (cr, &background);
+  cairo_arc (cr, width / 2.0, height / 2.0, MIN (width, height) / 2.0, 0, 2 * G_PI);
+  cairo_fill (cr);
 
-    cairo_move_to (cr, width / 2.0, height / 2.0);
+  cairo_move_to (cr, width / 2.0, height / 2.0);
 
-    // draw foreground arc
+  // draw foreground arc
+  if (progress > 0) {
     gdk_cairo_set_source_rgba (cr, &foreground);
     cairo_arc (cr, width / 2.0, height / 2.0, MIN (width, height) / 2.0, -G_PI / 2.0, progress * 2 * G_PI - G_PI / 2.0);
     cairo_fill (cr);
+  }
 
-    return FALSE;
+  return FALSE;
 }

@@ -341,7 +341,7 @@
             <property name="tooltip_text" translatable="yes">Show downloads</property>
             <property name="popover">downloads_popover</property>
             <child>
-              <object class="GtkDrawingArea" id="operations_icon">
+              <object class="GtkDrawingArea" id="download_progress_icon">
                 <property name="width_request">16</property>
                 <property name="height_request">16</property>
                 <property name="visible">True</property>
