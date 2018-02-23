@@ -31,8 +31,16 @@ void syn_get_data (void *callback) {
   sqlite3_close(db);
 }
 
-int unpack_file (char *filename, char *zRif) {
-  FILE *output = popen ("./pkg2zip PCSA00044", "r");
+int unpack_file (char *filename, char *zRIF) {
+  if (strcmp ("MISSING", zRIF) != 0 || strcmp ("NOT REQUIRED", zRIF) != 0) {
+    zRIF = "";
+  }
+
+  char commandBuf[200];
+  snprintf(commandBuf, sizeof commandBuf, "%s %s %s", "./pkg2zip", filename, zRIF);
+
+  puts (commandBuf);
+  FILE *output = popen (commandBuf, "r");
   if (!output) {
     fprintf (stderr, "incorrect parameters or too many files.\n");
     return 1;
