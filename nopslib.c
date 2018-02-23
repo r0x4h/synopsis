@@ -31,24 +31,31 @@ void syn_get_data (void *callback) {
   sqlite3_close(db);
 }
 
-int download_file (CURL *curl, char *url, char *filename) {
-  FILE *file = fopen (filename, "wb");
-  curl_easy_setopt (curl, CURLOPT_URL, url);
-  curl_easy_setopt (curl, CURLOPT_WRITEDATA, file);
-  CURLcode res = curl_easy_perform (curl);
-  fclose (file);
-
-  return res == CURLE_OK ? SYN_OK : SYN_ERROR;
-}
-
-int download_files () {
+int download_file (char *url, char *filename, void *progress_callback) {
   CURL *curl = curl_easy_init();
   if (!curl) {
     curl_easy_cleanup (curl);
     return SYN_ERROR;
   }
 
-  // download each file
+  FILE *file = fopen (filename, "wb");
+  curl_easy_setopt (curl, CURLOPT_URL, url);
+  curl_easy_setopt (curl, CURLOPT_WRITEDATA, file);
+
+  if (progress_callback != NULL) {
+    curl_easy_setopt (curl, CURLOPT_NOPROGRESS, 0L);
+    curl_easy_setopt (curl, CURLOPT_PROGRESSFUNCTION, progress_callback);
+  }
+
+  CURLcode res = curl_easy_perform (curl);
+
+  fclose (file);
+  curl_easy_cleanup (curl);
+
+  return res == CURLE_OK ? SYN_OK : SYN_ERROR;
+}
+
+int download_files () {
   for( int i = 0; i < NO_OF_FILES; i++) {
     // work out full path
     char *fileName = (char *)fileNames[i];
@@ -56,14 +63,12 @@ int download_files () {
     strcpy(fullUrl, baseUrl);
     strcat(fullUrl, fileName);
 
-    int res = download_file (curl, fullUrl, fileName);
+    int res = download_file (fullUrl, fileName, NULL);
     if (res != SYN_OK) {
-      curl_easy_cleanup (curl);
       return SYN_ERROR;
     }
   }
 
-  curl_easy_cleanup (curl);
   return SYN_OK;
 }
 
