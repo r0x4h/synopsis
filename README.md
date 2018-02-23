@@ -8,9 +8,9 @@ Build:
 - View complete list of games (PS VITA only for now)
 - Refresh to sync games list with nopaystation.com
 - Search (by Title Id & Name)
+- Ability to download .pkg files
 
 #TODO
-- Ability to download .pkg files
 - Decrypt & unpack .pkg files
 - Indication of download progress
 - Allow multiple simultaneous downloads
