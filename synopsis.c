@@ -26,6 +26,7 @@ typedef struct {
   gchar *titleId;
   gchar *name;
   gchar *url;
+  gchar *zRIF;
 } Download;
 
 enum columns {
@@ -35,6 +36,7 @@ enum columns {
   COL_NAME,
   COL_SIZE,
   COL_URL,
+  COL_ZRIF,
   N_COLUMNS
 };
 
@@ -58,6 +60,7 @@ static int populate_row_callback (void *data, int colCount, char *values[], char
                                              COL_NAME, values[2],
                                              COL_SIZE, values[8],
                                              COL_URL, values[3],
+                                             COL_ZRIF, values[4],
                                              -1);
   return 0;
 }
@@ -175,14 +178,17 @@ static int progress_callback (void* ptr, double downloadSize, double downloaded,
 }
 
 void *download_in_separate_thread (void *param) {
-  Download *downloadInfo = param;
-  download_file (downloadInfo->url, downloadInfo->titleId, progress_callback);
+  Download *info = param;
+  download_file (info->url, info->titleId, progress_callback);
+  unpack_file (info->titleId, info->zRIF);
+  remove (info->titleId);
 
   // cleanup
-  g_free (downloadInfo->titleId);
-  g_free (downloadInfo->name);
-  g_free (downloadInfo->url);
-  free (downloadInfo);
+  g_free (info->titleId);
+  g_free (info->name);
+  g_free (info->url);
+  g_free (info->zRIF);
+  free (info);
 
   return 0;
 }
@@ -199,8 +205,8 @@ void download_toggled (GtkCellRendererToggle *cell, gchar *path_string, gpointer
     gtk_list_store_set (list_store, &listStoreIter, COL_DOWNLOAD, !checked, -1);
 
     // show notification
-    gchar *titleId, *name, *url;
-    gtk_tree_model_get (model, &filterIter, COL_TITLE_ID, &titleId, COL_NAME, &name, COL_URL, &url, -1);
+    gchar *titleId, *name, *url, *zRIF;
+    gtk_tree_model_get (model, &filterIter, COL_TITLE_ID, &titleId, COL_NAME, &name, COL_URL, &url, COL_ZRIF, &zRIF, -1);
     add_to_download_queue (titleId, name, url);
 
     // download
@@ -208,6 +214,7 @@ void download_toggled (GtkCellRendererToggle *cell, gchar *path_string, gpointer
     downloadInfo->titleId = titleId;
     downloadInfo->name = name;
     downloadInfo->url = url;
+    downloadInfo->zRIF = zRIF;
     pthread_t tid;
     pthread_create (&tid, NULL, download_in_separate_thread, downloadInfo);
   }

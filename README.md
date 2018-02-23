@@ -9,9 +9,9 @@ Build:
 - Refresh to sync games list with nopaystation.com
 - Search (by Title Id & Name)
 - Ability to download .pkg files
+- Decrypt & unpack .pkg files
 
 #TODO
-- Decrypt & unpack .pkg files
 - Indication of download progress
 - Allow multiple simultaneous downloads
 - View cover art & other details about the selected game
