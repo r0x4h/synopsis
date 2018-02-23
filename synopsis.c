@@ -177,6 +177,7 @@ static int progress_callback (void* ptr, double downloadSize, double downloaded,
 void *download_in_separate_thread (void *param) {
   Download *downloadInfo = param;
   download_file (downloadInfo->url, downloadInfo->titleId, progress_callback);
+  unpack_file (downloadInfo->titleId);
 
   // cleanup
   g_free (downloadInfo->titleId);

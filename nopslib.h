@@ -3,4 +3,5 @@
 
 void syn_get_data (void *callback);
 int download_file (char *url, char *filename, void *progress_callback);
+int unpack_file (char *filename);
 int syn_refresh_db ();

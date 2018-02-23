@@ -31,6 +31,20 @@ void syn_get_data (void *callback) {
   sqlite3_close(db);
 }
 
+int unpack_file (char *filename, char *zRif) {
+  FILE *output = popen ("./pkg2zip PCSA00044", "r");
+  if (!output) {
+    fprintf (stderr, "incorrect parameters or too many files.\n");
+    return 1;
+  }
+
+  if (pclose (output) != 0) {
+    fprintf (stderr, "Could not run more or other error.\n");
+  }
+
+  return 0;
+}
+
 int download_file (char *url, char *filename, void *progress_callback) {
   CURL *curl = curl_easy_init();
   if (!curl) {
