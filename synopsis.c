@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include "nopslib.h"
 #include "util.h"
+#include <stdbool.h>
 
 #define NOTIFICATION_TIMEOUT 3 /*s */
 
@@ -20,7 +21,7 @@ GtkTreeModelFilter *filter_model;
 GtkBox *downloads_box;
 GtkWidget *download_progress_icon;
 
-gdouble progress = 0.65;
+gdouble progress = 0;
 
 typedef struct {
   gchar *titleId;
@@ -175,8 +176,20 @@ static int progress_callback (void* progress_data, double dltotal, double dlnow,
   //progress = downloaded / downloadSize;
   //gtk_widget_queue_draw (download_progress_icon);
 
-  Download *info = progress_data;
-  puts (info->titleId);
+  if (dltotal != 0) {
+    progress = dlnow / dltotal;
+
+    //Download *info = progress_data;
+    int progress_as_percentage = (int) (progress * 100);
+    bool is_five_percent_inc = progress_as_percentage % 10 == 0;
+    if (is_five_percent_inc) {
+      //gtk_widget_queue_draw (download_progress_icon);
+      //g_print ("%s:%d%%\n", info->titleId, progress_as_percentage);
+    }
+
+    gtk_widget_queue_draw (download_progress_icon);
+  }
+
   return 0;
 }
 
@@ -228,30 +241,30 @@ void notification_dismissed (GtkButton *button, gpointer user_data) {
 }
 
 gboolean on_operations_icon_draw (GtkWidget *widget, cairo_t *cr, gpointer user_data) {
-  GtkStyleContext *styleContext = gtk_widget_get_style_context (download_progress_icon);
-
-  GdkRGBA background;
-  GdkRGBA foreground;
-  gtk_style_context_get_color (styleContext, gtk_widget_get_state_flags (widget), &foreground);
-  background = foreground;
-  background.alpha *= 0.3;
-
-  guint width = gtk_widget_get_allocated_width (widget);
-  guint height = gtk_widget_get_allocated_height (widget);
-
-  // draw background circle
-  gdk_cairo_set_source_rgba (cr, &background);
-  cairo_arc (cr, width / 2.0, height / 2.0, MIN (width, height) / 2.0, 0, 2 * G_PI);
-  cairo_fill (cr);
-
-  cairo_move_to (cr, width / 2.0, height / 2.0);
-
-  // draw foreground arc
-  if (progress > 0) {
-    gdk_cairo_set_source_rgba (cr, &foreground);
-    cairo_arc (cr, width / 2.0, height / 2.0, MIN (width, height) / 2.0, -G_PI / 2.0, progress * 2 * G_PI - G_PI / 2.0);
-    cairo_fill (cr);
-  }
+  // GtkStyleContext *styleContext = gtk_widget_get_style_context (download_progress_icon);
+  //
+  // GdkRGBA background;
+  // GdkRGBA foreground;
+  // gtk_style_context_get_color (styleContext, gtk_widget_get_state_flags (widget), &foreground);
+  // background = foreground;
+  // background.alpha *= 0.3;
+  //
+  // guint width = gtk_widget_get_allocated_width (widget);
+  // guint height = gtk_widget_get_allocated_height (widget);
+  //
+  // // draw background circle
+  // gdk_cairo_set_source_rgba (cr, &background);
+  // cairo_arc (cr, width / 2.0, height / 2.0, MIN (width, height) / 2.0, 0, 2 * G_PI);
+  // cairo_fill (cr);
+  // 
+  // cairo_move_to (cr, width / 2.0, height / 2.0);
+  //
+  // // draw foreground arc
+  // if (progress > 0) {
+  //   gdk_cairo_set_source_rgba (cr, &foreground);
+  //   cairo_arc (cr, width / 2.0, height / 2.0, MIN (width, height) / 2.0, -G_PI / 2.0, progress * 2 * G_PI - G_PI / 2.0);
+  //   cairo_fill (cr);
+  // }
 
   return FALSE;
 }
