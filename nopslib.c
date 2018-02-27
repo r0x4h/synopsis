@@ -39,17 +39,15 @@ int unpack_file (char *filename, char *zRIF) {
   char commandBuf[200];
   snprintf(commandBuf, sizeof commandBuf, "%s %s %s", "./pkg2zip", filename, zRIF);
 
-  puts (commandBuf);
   FILE *output = popen (commandBuf, "r");
-  if (!output) {
-    fprintf (stderr, "incorrect parameters or too many files.\n");
+  if (output == NULL) {
     return 1;
   }
 
   if (pclose (output) != 0) {
-    fprintf (stderr, "Could not run more or other error.\n");
+    return 1;
   }
-
+  
   return 0;
 }
 
