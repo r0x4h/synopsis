@@ -171,15 +171,18 @@ void add_to_download_queue (char *titleId, char *name, char *url) {
   gtk_widget_show (label);
 }
 
-static int progress_callback (void* ptr, double downloadSize, double downloaded, double totalToUpload, double uploaded) {
+static int progress_callback (void* progress_data, double dltotal, double dlnow, double ultotal, double ulnow) {
   //progress = downloaded / downloadSize;
   //gtk_widget_queue_draw (download_progress_icon);
+
+  Download *info = progress_data;
+  puts (info->titleId);
   return 0;
 }
 
 void *download_in_separate_thread (void *param) {
   Download *info = param;
-  download_file (info->url, info->titleId, progress_callback);
+  download_file (info->url, info->titleId, progress_callback, param);
   unpack_file (info->titleId, info->zRIF);
   remove (info->titleId);
 

@@ -47,11 +47,11 @@ int unpack_file (char *filename, char *zRIF) {
   if (pclose (output) != 0) {
     return 1;
   }
-  
+
   return 0;
 }
 
-int download_file (char *url, char *filename, void *progress_callback) {
+int download_file (char *url, char *filename, void *progress_callback, void *progress_data) {
   CURL *curl = curl_easy_init();
   if (!curl) {
     curl_easy_cleanup (curl);
@@ -65,6 +65,7 @@ int download_file (char *url, char *filename, void *progress_callback) {
   if (progress_callback != NULL) {
     curl_easy_setopt (curl, CURLOPT_NOPROGRESS, 0L);
     curl_easy_setopt (curl, CURLOPT_PROGRESSFUNCTION, progress_callback);
+    curl_easy_setopt (curl, CURLOPT_PROGRESSDATA, progress_data);
   }
 
   CURLcode res = curl_easy_perform (curl);
@@ -83,7 +84,7 @@ int download_files () {
     strcpy(fullUrl, baseUrl);
     strcat(fullUrl, fileName);
 
-    int res = download_file (fullUrl, fileName, NULL);
+    int res = download_file (fullUrl, fileName, NULL, NULL);
     if (res != SYN_OK) {
       return SYN_ERROR;
     }

@@ -10,8 +10,8 @@ Build:
 - Search (by Title Id & Name)
 - Ability to download .pkg files
 - Decrypt & unpack .pkg files
+- Indication of download progress
 
 #TODO
-- Indication of download progress
 - Allow multiple simultaneous downloads
 - View cover art & other details about the selected game
