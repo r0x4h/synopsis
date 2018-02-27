@@ -1,7 +1,7 @@
 # synopsis
 
 Build:
-`gcc -o synopsis.o synopsis.c nopslib.c util.c $(pkg-config --cflags gtk+-3.0) $(pkg-config --libs gtk+-3.0) -lsqlite3 -lcurl -lpthread -rdynamic -Wall`
+`gcc -o synopsis.o synopsis.c nopslib.c util.c $(pkg-config --cflags gtk+-3.0) $(pkg-config --libs gtk+-3.0) -lsqlite3 -lcurl -lpthread -rdynamic -Wall -Werror`
 
 
 #Features
